@@ -33,11 +33,19 @@ namespace UnitTest_pfd
 			pfld::Facet fct;
 			ptvec v{ point(0, 0, -1000), point(1000, 0, 0), point(0, 1000, 0) };
 			fct.Init( v );
-			point r(0, 0, 1), g;
+			point r(0, 0, 1), g, g2, g3;
 			fct.FldVlado(r, g);
 			const double resval = 4.8207079871718046e-008;
 			point result(-resval, -resval, resval);
 			Assert::IsTrue(g.IsEqualEps(result));
+
+			pfld::Facet fctCopy(fct);
+			fctCopy.FldVlado(r, g2);
+			Assert::IsTrue(g2.IsEqualEps(result));
+
+			pfld::Facet fctAssign = fct;
+			fctAssign.FldVlado(r, g3);
+			Assert::IsTrue(g3.IsEqualEps(result));
 		}
 	};
 }
