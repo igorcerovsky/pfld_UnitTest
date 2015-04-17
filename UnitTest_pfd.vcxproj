@@ -22,6 +22,7 @@
     <ProjectGuid>{C1BC0A26-237E-48B3-92B3-8D0F7CD79535}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>UnitTest_pfd</RootNamespace>
+    <ProjectName>pfld_UnitTest</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
