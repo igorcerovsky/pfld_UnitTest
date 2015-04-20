@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
+#include <algorithm>
 
 #include "../pfld/facet.hpp"
 #include "../pfld/facet.cpp"
@@ -42,6 +43,32 @@ namespace UnitTest_pfd
 			point pt3(0.0, 0.0, 4.0);
 			pt3.Unit();
 			Assert::IsTrue(pt3==point(0,0,1));
+		}
+
+		TEST_METHOD(Test_Body)
+		{
+			using point = pfld::Point3D < double >;
+			using ptvec = pfld::ptvec;
+			pfld::Facet fct;
+			double a{ 1000. };
+			ptvec v{ point(0, 0, 0), point(0, 0, -a), point(a, 0, -a), point(0, a, -a) };
+			std::vector<ptvec> vf{
+				{ v[0], v[1], v[2] },
+				{ v[0], v[2], v[3] },
+				{ v[0], v[3], v[1] },
+				{ v[1], v[3], v[2] } };
+			pfld::facet_vec facets(4);
+			auto itVf = vf.begin();
+			for (auto it = facets.begin(); it != facets.end(); ++it, ++ itVf)
+				it->Init(*itVf);
+
+			point r(500, 500, 1), g;
+			for (auto it = facets.begin(); it != facets.end(); ++it)
+				it->Fld_G(r, g);
+
+			const point result(5.1341030021201644e-009, 5.1341030021201644e-009, 1.2401175118216113e-008);
+			Assert::IsTrue(g.IsEqualEps(result));
+
 		}
 
 		TEST_METHOD(Test_Facet)
