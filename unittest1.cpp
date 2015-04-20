@@ -66,6 +66,31 @@ namespace UnitTest_pfd
 			Assert::IsTrue(g3.IsEqualEps(result));
 		}
 
+		TEST_METHOD(Test_Facet_Lin0)
+		{
+			using point = pfld::Point3D < double >;
+			using ptvec = pfld::ptvec;
+			pfld::Facet fct;
+			ptvec v{ point(0, 0, -1000), point(1000, 0, 0), point(0, 1000, 0) };
+			const double ro0{ 1. };
+			point ro{ 0., 0., 0. };
+			const double resval = 4.8207079871718046e-008;
+			point result(-resval, -resval, resval);
+
+			fct.Init(v);
+			point r(0, 0, 1), g, g2, g3;
+			fct.Fld_G(r, ro, ro0, g);
+			Assert::IsTrue(g.IsEqualEps(result));
+
+			pfld::Facet fctCopy(fct);
+			fctCopy.Fld_G(r, g2);
+			Assert::IsTrue(g2.IsEqualEps(result));
+
+			pfld::Facet fctAssign = fct;
+			fctAssign.Fld_G(r, g3);
+			Assert::IsTrue(g3.IsEqualEps(result));
+		}
+
 		TEST_METHOD(Test_Facet_Lin)
 		{
 			using point = pfld::Point3D < double >;
@@ -76,21 +101,20 @@ namespace UnitTest_pfd
 			ptvec v{ point(0, 0, -1000), point(1000, 0, 0), point(0, 1000, 0) };
 			fct.Init(v);
 			point r(0, 0, 1), g, g2, g3;
-			fct.Fld_G(r, g, ro, ro0);
-			const double resval = 4.8207079871718046e-008;
+			fct.Fld_G(r, ro, ro0, g);
 			point result(-3.2142476436014269e-005, -3.2142476436014269e-005, 5.6270119911809142e-005);
 			Assert::IsTrue(g.IsEqualEps(result));
 
 			pfld::Facet fctCopy(fct);
-			fctCopy.Fld_G(r, g2, ro, ro0);
+			fctCopy.Fld_G(r, ro, ro0, g2);
 			Assert::IsTrue(g2.IsEqualEps(result));
 
 			pfld::Facet fctAssign = fct;
-			fctAssign.Fld_G(r, g3, ro, ro0);
+			fctAssign.Fld_G(r, ro, ro0, g3);
 			Assert::IsTrue(g3.IsEqualEps(result));
 
 			pfld::Facet fctGz = fct;
-			double gz;
+			double gz=0.0;
 			fctGz.Fld_Gz(r, ro, ro0, gz);
 			Assert::IsTrue(almost_equal(gz, result.z, 4));
 		}
@@ -132,7 +156,11 @@ namespace UnitTest_pfd
 				Assert::IsTrue(bEQ);
 			}
 		}
+
+
 	};
+
+
 
 	void Compute(void(*FieldFn)(pfld::facet_vec&, pfld::ptvec&, pfld::valvec&),
 		pfld::facet_vec& facets, pfld::ptvec& fldPoints, pfld::valvec& outFld,
