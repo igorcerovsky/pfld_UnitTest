@@ -15,11 +15,14 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace UnitTest_pfd
 {		
+
 	template<class T>
 	typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type
 		almost_equal(T x, T y, int ulp)
 	{
-		return std::abs(x - y) < std::numeric_limits<T>::epsilon() * std::abs(x + y) * ulp
+		auto a = std::abs(x - y);
+		auto b = std::numeric_limits<T>::epsilon() * std::abs(x + y) * ulp;
+		return std::abs(x - y) < std::numeric_limits<T>::epsilon() * std::abs(x + y) * pow(10, ulp)
 			|| std::abs(x - y) < std::numeric_limits<T>::min();
 	}
 
@@ -63,12 +66,22 @@ namespace UnitTest_pfd
 				it->Init(*itVf);
 
 			point r(500, 500, 1), g;
+			point M{1,10,100}, gGS, m;
+			double gzGS{ 0. }, gzV{ 0. };
 			for (auto it = facets.begin(); it != facets.end(); ++it)
+			{
 				it->Fld_G(r, g);
+				it->Fld_Gz(r, gzV);
+				it->FldGS(r, M, m, gGS);
+				it->FldGS_Gz(r, gzGS);
+			}
 
 			const point result(5.1341030021201644e-009, 5.1341030021201644e-009, 1.2401175118216113e-008);
-			Assert::IsTrue(g.IsEqualEps(result));
-
+			Assert::IsTrue(g.IsEqualEps( result, 1.0e-16));
+			Assert::IsTrue(gGS.IsEqualEps(result, 1.0e-16));
+			Assert::IsTrue(g.IsEqualEps(gGS));
+			Assert::IsTrue(almost_equal(g.z, gzV, 2));
+			Assert::IsTrue(almost_equal(gGS.z, gzGS, 2));
 		}
 
 		TEST_METHOD(Test_Facet)
@@ -143,7 +156,7 @@ namespace UnitTest_pfd
 			pfld::Facet fctGz = fct;
 			double gz=0.0;
 			fctGz.Fld_Gz(r, ro, ro0, gz);
-			Assert::IsTrue(almost_equal(gz, result.z, 4));
+			Assert::IsTrue(almost_equal(gz, result.z, 2));
 		}
 
 		const char* file_facets =  "./../../../pfld_UnitTest/test_data/pfld_test_facets.txt";
@@ -169,7 +182,7 @@ namespace UnitTest_pfd
 			auto itCmp = outFld.begin();
 			for (auto it = res.begin(); it != res.end(); ++it, ++itCmp)
 			{
-				bool bEQ = almost_equal(*it, *itCmp, 4);
+				bool bEQ = almost_equal(*it, *itCmp, 2);
 				Assert::IsTrue(bEQ);
 			}
 
@@ -179,7 +192,7 @@ namespace UnitTest_pfd
 			itCmp = outFld1.begin();
 			for (auto it = res.begin(); it != res.end(); ++it, ++itCmp)
 			{
-				bool bEQ = almost_equal(*it, *itCmp, 4);
+				bool bEQ = almost_equal(*it, *itCmp, 2);
 				Assert::IsTrue(bEQ);
 			}
 		}
