@@ -34,3 +34,6 @@ Debug/unittest1.obj
 Debug/vc120.pdb
 Debug/UnitTest_pfd.tlog/link.read.1.tlog
 Debug/UnitTest_pfd.tlog/CL.read.1.tlog
+Debug/stdafx.obj
+Debug/unittest1.obj
+Debug/vc120.idb
