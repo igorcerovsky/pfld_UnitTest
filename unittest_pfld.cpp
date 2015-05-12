@@ -2,7 +2,7 @@
 #include "CppUnitTest.h"
 #include <algorithm>
 
-#include "../pfld/facet.hpp"
+#include "../pfld/facet.h"
 #include "../pfld/facet.cpp"
 #include "../pfld/pfld_compute.hpp"
 #include "../pfld/pfld_compute.cpp"
