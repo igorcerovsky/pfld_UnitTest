@@ -34,8 +34,8 @@ namespace UnitTest_pfd
 		Assert::AreEqual(pt1.z, pt2.z, eps);
 	};
 
-	void Compute(void(*FieldFn)(pfld::facet_vec&, pfld::ptvec&, pfld::valvec&),
-		pfld::facet_vec& facets, pfld::ptvec& fldPoints, pfld::valvec& outFld,
+	void Compute(void(*FieldFn)(pfld::facetvec&, pfld::ptvec&, pfld::valvec&),
+		pfld::facetvec& facets, pfld::ptvec& fldPoints, pfld::valvec& outFld,
 		std::string message);
 
 	TEST_CLASS(UnitTest1)
@@ -60,7 +60,7 @@ namespace UnitTest_pfd
 		{
 			using point = pfld::Point3D < double >;
 			using ptvec = pfld::ptvec;
-			pfld::Facet fct;
+			pfld::facet fct;
 			double a{ 1000. };
 			ptvec v{ point(0, 0, 0), point(0, 0, -a), point(a, 0, -a), point(0, a, -a) };
 			std::vector<ptvec> vf{
@@ -68,7 +68,7 @@ namespace UnitTest_pfd
 				{ v[0], v[2], v[3] },
 				{ v[0], v[3], v[1] },
 				{ v[1], v[3], v[2] } };
-			pfld::facet_vec facets(4);
+			pfld::facetvec facets(4);
 			auto itVf = vf.begin();
 			for (auto it = facets.begin(); it != facets.end(); ++it, ++itVf)
 				it->Init(*itVf);
@@ -101,7 +101,7 @@ namespace UnitTest_pfd
 			const auto eps = 1.0e-16;
 			using point = pfld::Point3D < double >;
 			using ptvec = pfld::ptvec;
-			pfld::Facet fct;
+			pfld::facet fct;
 			ptvec v{ point(0, 0, -1000), point(1000, 0, 0), point(0, 1000, 0) };
 			fct.Init(v);
 			point r(0, 0, 1), g, g2, g3;
@@ -110,11 +110,11 @@ namespace UnitTest_pfd
 			point result(-resval, -resval, resval);
 			AssertPoints(g, result, eps);
 
-			pfld::Facet fctCopy(fct);
+			pfld::facet fctCopy(fct);
 			fctCopy.Fld_G(r, g2);
 			AssertPoints(g2, result, eps);
 
-			pfld::Facet fctAssign = fct;
+			pfld::facet fctAssign = fct;
 			fctAssign.Fld_G(r, g3);
 			AssertPoints(g3, result, eps);
 		}
@@ -123,7 +123,7 @@ namespace UnitTest_pfd
 		{
 			using point = pfld::Point3D < double >;
 			using ptvec = pfld::ptvec;
-			pfld::Facet fct;
+			pfld::facet fct;
 			ptvec v{ point(0, 0, -1000), point(1000, 0, 0), point(0, 1000, 0) };
 			const double ro0{ 1. };
 			point ro{ 0., 0., 0. };
@@ -136,11 +136,11 @@ namespace UnitTest_pfd
 			fct.Fld_G(r, ro, ro0, g);
 			AssertPoints(g, result, eps);
 
-			pfld::Facet fctCopy(fct);
+			pfld::facet fctCopy(fct);
 			fctCopy.Fld_G(r, g2);
 			AssertPoints(g2, result, eps);
 
-			pfld::Facet fctAssign = fct;
+			pfld::facet fctAssign = fct;
 			fctAssign.Fld_G(r, g3);
 			AssertPoints(g3, result, eps);
 		}
@@ -150,7 +150,7 @@ namespace UnitTest_pfd
 			const auto eps = 1.0e-16;
 			using point = pfld::Point3D < double >;
 			using ptvec = pfld::ptvec;
-			pfld::Facet fct;
+			pfld::facet fct;
 			const double ro0{ 1000.};
 			point ro{ 0., 0., 1. };
 			ptvec v{ point(0, 0, -1000), point(1000, 0, 0), point(0, 1000, 0) };
@@ -160,15 +160,15 @@ namespace UnitTest_pfd
 			point result(-3.2142476436014269e-005, -3.2142476436014269e-005, 5.6270119911809142e-005);
 			AssertPoints(g, result, eps);
 
-			pfld::Facet fctCopy(fct);
+			pfld::facet fctCopy(fct);
 			fctCopy.Fld_G(r, ro, ro0, g2);
 			AssertPoints(g2, result, eps);
 
-			pfld::Facet fctAssign = fct;
+			pfld::facet fctAssign = fct;
 			fctAssign.Fld_G(r, ro, ro0, g3);
 			AssertPoints(g3, result, eps);
 
-			pfld::Facet fctGz = fct;
+			pfld::facet fctGz = fct;
 			double gz=0.0;
 			fctGz.Fld_Gz(r, ro, ro0, gz);
 			Assert::IsTrue(almost_equal(gz, result.z, 2));
@@ -182,12 +182,12 @@ namespace UnitTest_pfd
 
 		TEST_METHOD(Test_Facet_Parallell)
 		{
-			pfld::facet_vec facets;
+			pfld::facetvec facets;
 			pfld::GetFacets(facets, file_facets, max_facets_to_load, false);
 
 			pfld::ptvec fldPts;
 			pfld::GetFieldPoints(fldPts, file_points, max_points_to_load, false);
-			void(*FieldFn)(pfld::facet_vec&, pfld::ptvec&, pfld::valvec&);
+			void(*FieldFn)(pfld::facetvec&, pfld::ptvec&, pfld::valvec&);
 			pfld::valvec outFld; // uninitialized for this version
 			FieldFn = pfld::Field_Gz_;
 			Compute(FieldFn, facets, fldPts, outFld, "computing facets parallel future approach...");
@@ -217,8 +217,8 @@ namespace UnitTest_pfd
 
 
 
-	void Compute(void(*FieldFn)(pfld::facet_vec&, pfld::ptvec&, pfld::valvec&),
-		pfld::facet_vec& facets, pfld::ptvec& fldPoints, pfld::valvec& outFld,
+	void Compute(void(*FieldFn)(pfld::facetvec&, pfld::ptvec&, pfld::valvec&),
+		pfld::facetvec& facets, pfld::ptvec& fldPoints, pfld::valvec& outFld,
 		std::string message)
 	{
 		using namespace std::chrono;
